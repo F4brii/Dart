@@ -7,8 +7,10 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   String operaciones = "";
-  String resultado = "";
-  List<Text> resultadoText = [];
+  String error = "";
+  List<Container> containers = [];
+  List<Text> texts = [];
+  int noSignos = 0;
 
   get title => null;
 
@@ -30,9 +32,8 @@ class _MyHomePageState extends State<MyHomePage> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: resultadoText,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: containers,
                 ),
               ],
             ),
@@ -41,7 +42,13 @@ class _MyHomePageState extends State<MyHomePage> {
             color: Colors.blue,
             height: 100,
             child: Row(
-              children: [Text(operaciones)],
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [Text(operaciones), Text(error)],
+                )
+              ],
             ),
           ),
           Container(
@@ -161,54 +168,14 @@ class _MyHomePageState extends State<MyHomePage> {
                         onPressed: () {
                           setState(() {
                             operaciones = "";
+                            error = "";
+                            noSignos = 0;
                           });
                         },
                         child: Text("C")),
                     ElevatedButton(
                         onPressed: () {
-                          List<String> suma = operaciones.split(" ");
-                          switch (suma[1].trim()) {
-                            case "+":
-                              var resul =
-                                  int.parse(suma[0]) + int.parse(suma[2]);
-                              setState(() {
-                                resultadoText
-                                    .add(Text(operaciones + " = " + " $resul"));
-                                operaciones = "";
-                              });
-                              print(resul);
-                              break;
-                            case "-":
-                              var resul =
-                                  int.parse(suma[0]) - int.parse(suma[2]);
-                              setState(() {
-                                resultadoText
-                                    .add(Text(operaciones + " = " + " $resul"));
-                                operaciones = "";
-                              });
-                              print(resul);
-                              break;
-                            case "x":
-                              var resul =
-                                  int.parse(suma[0]) * int.parse(suma[2]);
-                              setState(() {
-                                resultadoText
-                                    .add(Text(operaciones + " = " + " $resul"));
-                                operaciones = "";
-                              });
-                              print(resul);
-                              break;
-                            case "/":
-                              var resul =
-                                  int.parse(suma[0]) / int.parse(suma[2]);
-                              setState(() {
-                                resultadoText
-                                    .add(Text(operaciones + " = " + " $resul"));
-                                operaciones = "";
-                              });
-                              print(resul);
-                              break;
-                          }
+                          operacion();
                         },
                         child: Text("=")),
                     ElevatedButton(
@@ -225,4 +192,72 @@ class _MyHomePageState extends State<MyHomePage> {
           )
         ],
       );
+
+  operacion() {
+    List<String> ejercicio = operaciones.split(" ");
+    var resultado;
+    int errores = 0;
+    try {
+      switch (ejercicio[1].trim()) {
+        case "/":
+          try {
+            resultado = int.parse(ejercicio[0]) / int.parse(ejercicio[2]);
+          } catch (e) {
+            errores++;
+          }
+          break;
+        case "x":
+          try {
+            resultado = int.parse(ejercicio[0]) * int.parse(ejercicio[2]);
+          } catch (e) {
+            errores++;
+          }
+          break;
+        case "+":
+          try {
+            resultado = int.parse(ejercicio[0]) + int.parse(ejercicio[2]);
+          } catch (e) {
+            errores++;
+          }
+          break;
+        case "-":
+          try {
+            resultado = int.parse(ejercicio[0]) - int.parse(ejercicio[2]);
+          } catch (e) {
+            errores++;
+          }
+          break;
+        default:
+          break;
+      }
+
+      if (errores == 0) {
+        setState(() {
+          containers.add(Container(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [Text(operaciones), Text(" = "), Text("$resultado")],
+            ),
+          ));
+          operaciones = "";
+        });
+      } else {
+        setState(() {
+          error = "Expresion mal formada";
+        });
+      }
+    } catch (e) {
+      if (noSignos == 0) {
+        setState(() {
+          containers.add(Container(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [Text(operaciones)],
+            ),
+          ));
+        });
+      }
+      noSignos++;
+    }
+  }
 }
