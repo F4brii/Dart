@@ -12,7 +12,22 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text("Calculadora"),
       ),
-      body: Container(),
+      body: _body(),
     );
   }
+
+  Widget _body() => Column(
+        children: [
+          Container(
+            color: Colors.red,
+          ),
+          Container(
+            color: Colors.blue,
+            height: 100,
+          ),
+          Container(
+            color: Colors.yellow,
+          )
+        ],
+      );
 }
