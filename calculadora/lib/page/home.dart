@@ -7,6 +7,10 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   String operaciones = "";
+  String resultado = "";
+  List<Text> resultadoText = [];
+
+  get title => null;
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +26,16 @@ class _MyHomePageState extends State<MyHomePage> {
         children: [
           Expanded(
               child: Container(
-            color: Colors.red,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: resultadoText,
+                ),
+              ],
+            ),
           )),
           Container(
             color: Colors.blue,
@@ -62,7 +75,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ElevatedButton(
                         onPressed: () {
                           setState(() {
-                            operaciones += "/";
+                            operaciones += " / ";
                           });
                         },
                         child: Text("/"))
@@ -95,7 +108,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ElevatedButton(
                         onPressed: () {
                           setState(() {
-                            operaciones += "*";
+                            operaciones += " x ";
                           });
                         },
                         child: Text("x"))
@@ -128,7 +141,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ElevatedButton(
                         onPressed: () {
                           setState(() {
-                            operaciones += "-";
+                            operaciones += " - ";
                           });
                         },
                         child: Text("-"))
@@ -151,11 +164,57 @@ class _MyHomePageState extends State<MyHomePage> {
                           });
                         },
                         child: Text("C")),
-                    ElevatedButton(onPressed: () {}, child: Text("=")),
+                    ElevatedButton(
+                        onPressed: () {
+                          List<String> suma = operaciones.split(" ");
+                          switch (suma[1].trim()) {
+                            case "+":
+                              var resul =
+                                  int.parse(suma[0]) + int.parse(suma[2]);
+                              setState(() {
+                                resultadoText
+                                    .add(Text(operaciones + " = " + " $resul"));
+                                operaciones = "";
+                              });
+                              print(resul);
+                              break;
+                            case "-":
+                              var resul =
+                                  int.parse(suma[0]) - int.parse(suma[2]);
+                              setState(() {
+                                resultadoText
+                                    .add(Text(operaciones + " = " + " $resul"));
+                                operaciones = "";
+                              });
+                              print(resul);
+                              break;
+                            case "x":
+                              var resul =
+                                  int.parse(suma[0]) * int.parse(suma[2]);
+                              setState(() {
+                                resultadoText
+                                    .add(Text(operaciones + " = " + " $resul"));
+                                operaciones = "";
+                              });
+                              print(resul);
+                              break;
+                            case "/":
+                              var resul =
+                                  int.parse(suma[0]) / int.parse(suma[2]);
+                              setState(() {
+                                resultadoText
+                                    .add(Text(operaciones + " = " + " $resul"));
+                                operaciones = "";
+                              });
+                              print(resul);
+                              break;
+                          }
+                        },
+                        child: Text("=")),
                     ElevatedButton(
                         onPressed: () {
                           setState(() {
-                            operaciones += "+";
+                            operaciones += " + ";
                           });
                         },
                         child: Text("+"))
