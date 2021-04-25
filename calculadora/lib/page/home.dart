@@ -85,7 +85,14 @@ class _MyHomePageState extends State<MyHomePage> {
                             operaciones += " / ";
                           });
                         },
-                        child: Text("/"))
+                        child: Text("/")),
+                    ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            operaciones += " √ ";
+                          });
+                        },
+                        child: Text("√"))
                   ],
                 ),
                 Row(
@@ -118,7 +125,14 @@ class _MyHomePageState extends State<MyHomePage> {
                             operaciones += " x ";
                           });
                         },
-                        child: Text("x"))
+                        child: Text("x")),
+                    ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            operaciones += " ² ";
+                          });
+                        },
+                        child: Text("χ²"))
                   ],
                 ),
                 Row(
@@ -151,7 +165,14 @@ class _MyHomePageState extends State<MyHomePage> {
                             operaciones += " - ";
                           });
                         },
-                        child: Text("-"))
+                        child: Text("-")),
+                    ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            operaciones += " % ";
+                          });
+                        },
+                        child: Text("%"))
                   ],
                 ),
                 Row(
@@ -167,6 +188,13 @@ class _MyHomePageState extends State<MyHomePage> {
                     ElevatedButton(
                         onPressed: () {
                           setState(() {
+                            operaciones += "";
+                          });
+                        },
+                        child: Text("")),
+                    ElevatedButton(
+                        onPressed: () {
+                          setState(() {
                             operaciones = "";
                             error = "";
                             noSignos = 0;
@@ -175,16 +203,17 @@ class _MyHomePageState extends State<MyHomePage> {
                         child: Text("C")),
                     ElevatedButton(
                         onPressed: () {
-                          operacion();
-                        },
-                        child: Text("=")),
-                    ElevatedButton(
-                        onPressed: () {
                           setState(() {
                             operaciones += " + ";
                           });
                         },
-                        child: Text("+"))
+                        child: Text("+")),
+                    ElevatedButton(
+                      onPressed: () {
+                        operacion();
+                      },
+                      child: Text("="),
+                    ),
                   ],
                 )
               ],
@@ -194,70 +223,93 @@ class _MyHomePageState extends State<MyHomePage> {
       );
 
   operacion() {
-    List<String> ejercicio = operaciones.split(" ");
-    var resultado;
-    int errores = 0;
-    try {
-      switch (ejercicio[1].trim()) {
-        case "/":
-          try {
-            resultado = int.parse(ejercicio[0]) / int.parse(ejercicio[2]);
-          } catch (e) {
-            errores++;
-          }
+    String operacionInicial = operaciones;
+    do {
+      List<String> operacion = operaciones.split(' ');
+      if (operacion.length == 1) {
+        if (operaciones.contains('+') ||
+            operaciones.contains('-') ||
+            operaciones.contains('x') ||
+            operaciones.contains('/')) {
           break;
-        case "x":
-          try {
-            resultado = int.parse(ejercicio[0]) * int.parse(ejercicio[2]);
-          } catch (e) {
-            errores++;
-          }
+        } else {
+          noSignos++;
           break;
-        case "+":
-          try {
-            resultado = int.parse(ejercicio[0]) + int.parse(ejercicio[2]);
-          } catch (e) {
-            errores++;
-          }
-          break;
-        case "-":
-          try {
-            resultado = int.parse(ejercicio[0]) - int.parse(ejercicio[2]);
-          } catch (e) {
-            errores++;
-          }
-          break;
-        default:
-          break;
+        }
       }
 
-      if (errores == 0) {
-        setState(() {
-          containers.add(Container(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [Text(operaciones), Text(" = "), Text("$resultado")],
-            ),
-          ));
-          operaciones = "";
-        });
-      } else {
-        setState(() {
-          error = "Expresion mal formada";
-        });
+      if (operaciones.contains('x') || operaciones.contains('/')) {
+        noSignos = 0;
+        for (int x = 0; x < operacion.length; x++) {
+          if (operacion[x] == 'x') {
+            var resultado =
+                int.parse(operacion[x - 1]) * int.parse(operacion[x + 1]);
+
+            operaciones = operaciones.replaceAll(
+                '${operacion[x - 1]} ${operacion[x]} ${operacion[x + 1]}',
+                '$resultado');
+            break;
+          } else if (operacion[x] == '/') {
+            var resultado =
+                int.parse(operacion[x - 1]) / int.parse(operacion[x + 1]);
+
+            operaciones = operaciones.replaceAll(
+                '${operacion[x - 1]} ${operacion[x]} ${operacion[x + 1]}',
+                '$resultado');
+            break;
+          }
+        }
+      } else if (operaciones.contains('+') || operaciones.contains('-')) {
+        noSignos = 0;
+        for (int x = 0; x < operacion.length; x++) {
+          if (operacion[x] == '+') {
+            var resultado =
+                int.parse(operacion[x - 1]) + int.parse(operacion[x + 1]);
+
+            operaciones = operaciones.replaceAll(
+                '${operacion[x - 1]} ${operacion[x]} ${operacion[x + 1]}',
+                '$resultado');
+            break;
+          } else if (operacion[x] == '-') {
+            var resultado =
+                int.parse(operacion[x - 1]) - int.parse(operacion[x + 1]);
+
+            operaciones = operaciones.replaceAll(
+                '${operacion[x - 1]} ${operacion[x]} ${operacion[x + 1]}',
+                '$resultado');
+            break;
+          }
+        }
       }
-    } catch (e) {
-      if (noSignos == 0) {
+    } while (operaciones.contains('+') ||
+        operaciones.contains('-') ||
+        operaciones.contains('x') ||
+        operaciones.contains('/'));
+
+    if (noSignos > 0) {
+      if (noSignos == 1) {
         setState(() {
           containers.add(Container(
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [Text(operaciones)],
             ),
           ));
         });
       }
-      noSignos++;
+    } else {
+      setState(() {
+        containers.add(Container(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Text(operacionInicial),
+              Text("   =   "),
+              Text(operaciones)
+            ],
+          ),
+        ));
+      });
     }
   }
 }
