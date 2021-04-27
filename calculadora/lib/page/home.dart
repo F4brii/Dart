@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -224,91 +226,111 @@ class _MyHomePageState extends State<MyHomePage> {
 
   operacion() {
     String operacionInicial = operaciones;
-    do {
-      List<String> operacion = operaciones.split(' ');
-      if (operacion.length == 1) {
-        if (operaciones.contains('+') ||
-            operaciones.contains('-') ||
-            operaciones.contains('x') ||
-            operaciones.contains('/')) {
-          break;
-        } else {
-          noSignos++;
-          break;
-        }
-      }
-
-      if (operaciones.contains('x') || operaciones.contains('/')) {
-        noSignos = 0;
-        for (int x = 0; x < operacion.length; x++) {
-          if (operacion[x] == 'x') {
-            var resultado =
-                int.parse(operacion[x - 1]) * int.parse(operacion[x + 1]);
-
-            operaciones = operaciones.replaceAll(
-                '${operacion[x - 1]} ${operacion[x]} ${operacion[x + 1]}',
-                '$resultado');
+    try {
+      do {
+        List<String> operacion = operaciones.split(' ');
+        if (operacion.length == 1) {
+          if (operaciones.contains('+') ||
+              operaciones.contains('-') ||
+              operaciones.contains('x') ||
+              operaciones.contains('/')) {
             break;
-          } else if (operacion[x] == '/') {
-            var resultado =
-                int.parse(operacion[x - 1]) / int.parse(operacion[x + 1]);
-
-            operaciones = operaciones.replaceAll(
-                '${operacion[x - 1]} ${operacion[x]} ${operacion[x + 1]}',
-                '$resultado');
+          } else {
+            noSignos++;
             break;
           }
         }
-      } else if (operaciones.contains('+') || operaciones.contains('-')) {
-        noSignos = 0;
-        for (int x = 0; x < operacion.length; x++) {
-          if (operacion[x] == '+') {
-            var resultado =
-                int.parse(operacion[x - 1]) + int.parse(operacion[x + 1]);
+        if (operaciones.contains('√') || operaciones.contains('²')) {
+          noSignos = 0;
+          for (int x = 0; x < operacion.length; x++) {
+            if (operacion[x] == '√') {
+              var resultado = pow(int.parse(operacion[x + 1]), 1 / 2);
+              operaciones = operaciones.replaceAll(
+                  '${operacion[x]} ${operacion[x + 1]}', '$resultado');
+            } else if (operacion[x] == '²') {
+              var resultado = pow(int.parse(operacion[x - 1]), 2);
+              operaciones = operaciones.replaceAll(
+                  '${operacion[x - 1]} ${operacion[x]}', '$resultado');
+            }
+          }
+        } else if (operaciones.contains('x') || operaciones.contains('/')) {
+          noSignos = 0;
+          for (int x = 0; x < operacion.length; x++) {
+            if (operacion[x] == 'x') {
+              var resultado =
+                  int.parse(operacion[x - 1]) * int.parse(operacion[x + 1]);
 
-            operaciones = operaciones.replaceAll(
-                '${operacion[x - 1]} ${operacion[x]} ${operacion[x + 1]}',
-                '$resultado');
-            break;
-          } else if (operacion[x] == '-') {
-            var resultado =
-                int.parse(operacion[x - 1]) - int.parse(operacion[x + 1]);
+              operaciones = operaciones.replaceAll(
+                  '${operacion[x - 1]} ${operacion[x]} ${operacion[x + 1]}',
+                  '$resultado');
+              break;
+            } else if (operacion[x] == '/') {
+              var resultado =
+                  int.parse(operacion[x - 1]) / int.parse(operacion[x + 1]);
 
-            operaciones = operaciones.replaceAll(
-                '${operacion[x - 1]} ${operacion[x]} ${operacion[x + 1]}',
-                '$resultado');
-            break;
+              operaciones = operaciones.replaceAll(
+                  '${operacion[x - 1]} ${operacion[x]} ${operacion[x + 1]}',
+                  '$resultado');
+              break;
+            }
+          }
+        } else if (operaciones.contains('+') || operaciones.contains('-')) {
+          noSignos = 0;
+          for (int x = 0; x < operacion.length; x++) {
+            if (operacion[x] == '+') {
+              var resultado =
+                  int.parse(operacion[x - 1]) + int.parse(operacion[x + 1]);
+
+              operaciones = operaciones.replaceAll(
+                  '${operacion[x - 1]} ${operacion[x]} ${operacion[x + 1]}',
+                  '$resultado');
+              break;
+            } else if (operacion[x] == '-') {
+              var resultado =
+                  int.parse(operacion[x - 1]) - int.parse(operacion[x + 1]);
+
+              operaciones = operaciones.replaceAll(
+                  '${operacion[x - 1]} ${operacion[x]} ${operacion[x + 1]}',
+                  '$resultado');
+              break;
+            }
           }
         }
-      }
-    } while (operaciones.contains('+') ||
-        operaciones.contains('-') ||
-        operaciones.contains('x') ||
-        operaciones.contains('/'));
+      } while (operaciones.contains('+') ||
+          operaciones.contains('-') ||
+          operaciones.contains('x') ||
+          operaciones.contains('/') ||
+          operaciones.contains('√') ||
+          operaciones.contains('²'));
 
-    if (noSignos > 0) {
-      if (noSignos == 1) {
+      if (noSignos > 0) {
+        if (noSignos == 1) {
+          setState(() {
+            containers.add(Container(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [Text(operaciones)],
+              ),
+            ));
+          });
+        }
+      } else {
         setState(() {
           containers.add(Container(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [Text(operaciones)],
+              children: [
+                Text(operacionInicial),
+                Text("   =   "),
+                Text(operaciones)
+              ],
             ),
           ));
         });
       }
-    } else {
+    } catch (e) {
       setState(() {
-        containers.add(Container(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              Text(operacionInicial),
-              Text("   =   "),
-              Text(operaciones)
-            ],
-          ),
-        ));
+        error = "Operacion mal formulada";
       });
     }
   }
